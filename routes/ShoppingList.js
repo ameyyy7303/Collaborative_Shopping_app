@@ -153,5 +153,5 @@ router.post('/:listId/collaborators', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Export the router LAS
+// ✅ Export the router LAST
 module.exports = router;
