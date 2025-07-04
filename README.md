@@ -2,7 +2,6 @@
 
 A real-time collaborative shopping list application that lets you create, share, and manage shopping lists with friends and family. Built with modern web technologies for seamless real-time collaboration.
 
-![ShopSync Demo](https://img.shields.io/badge/Status-Live%20Demo-blue)
 ![React](https://img.shields.io/badge/React-19.1.0-61dafb)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933)
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.15.1-47a248)
