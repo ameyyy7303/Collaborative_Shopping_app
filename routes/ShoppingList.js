@@ -60,6 +60,12 @@ router.post('/:listId/items', authMiddleware, async (req, res) => {
     list.items.push(newItem);
     await list.save();
 
+    // 🔄 Real-time update via socket
+    global.io.to(listId).emit('item_added', {
+      listId,
+      item: list.items[list.items.length - 1],
+    });
+
     res.status(200).json(list);
   } catch (err) {
     res.status(500).json({ error: 'Something went wrong' });
@@ -86,6 +92,13 @@ router.patch('/:listId/items/:itemId', authMiddleware, async (req, res) => {
     item.bought = bought;
     await list.save();
 
+    // 🔄 Real-time update
+    global.io.to(listId).emit('item_updated', {
+      listId,
+      itemId,
+      bought,
+    });
+
     res.status(200).json(list);
   } catch (err) {
     res.status(500).json({ error: 'Something went wrong' });
@@ -95,12 +108,9 @@ router.patch('/:listId/items/:itemId', authMiddleware, async (req, res) => {
 // ✅ Delete item from a shopping list
 router.delete('/:listId/items/:itemId', authMiddleware, async (req, res) => {
   const { listId, itemId } = req.params;
-  console.log('DELETE request received:', listId, itemId);
 
   try {
     const list = await ShoppingList.findById(listId);
-    console.log('Fetched list:', list);
-
     if (!list) return res.status(404).json({ error: 'List not found' });
 
     if (list.owner.toString() !== req.userId &&
@@ -109,23 +119,24 @@ router.delete('/:listId/items/:itemId', authMiddleware, async (req, res) => {
     }
 
     const item = list.items.id(itemId);
-    console.log('Found item:', item);
-
     if (!item) return res.status(404).json({ error: 'Item not found' });
 
-    // 🔥 FIXED: Manually remove the item
     list.items = list.items.filter(i => i._id.toString() !== itemId);
-
     await list.save();
+
+    // 🔄 Real-time update
+    global.io.to(listId).emit('item_deleted', {
+      listId,
+      itemId,
+    });
 
     res.status(200).json({ message: 'Item deleted', list });
   } catch (err) {
-    console.error('❌ Error deleting item:', err);
     res.status(500).json({ error: err.message || 'Something went wrong' });
   }
 });
 
-// Add collaborator to a list
+// ✅ Add collaborator to a list
 router.post('/:listId/collaborators', authMiddleware, async (req, res) => {
   const { listId } = req.params;
   const { collaboratorId } = req.body;
@@ -134,7 +145,6 @@ router.post('/:listId/collaborators', authMiddleware, async (req, res) => {
     const list = await ShoppingList.findById(listId);
     if (!list) return res.status(404).json({ error: 'List not found' });
 
-    // Only the owner can add collaborators
     if (list.owner.toString() !== req.userId) {
       return res.status(403).json({ error: 'Only owner can add collaborators' });
     }
@@ -146,12 +156,16 @@ router.post('/:listId/collaborators', authMiddleware, async (req, res) => {
     list.collaborators.push(collaboratorId);
     await list.save();
 
+    // (Optional) Emit if you want others to know
+    global.io.to(listId).emit('collaborator_added', {
+      listId,
+      collaboratorId,
+    });
+
     res.status(200).json({ message: 'Collaborator added', list });
   } catch (err) {
-    console.error('❌ Error adding collaborator:', err);
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
 
-// ✅ Export the router LAST
 module.exports = router;
