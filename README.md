@@ -2,11 +2,6 @@
 
 A real-time collaborative shopping list application that lets you create, share, and manage shopping lists with friends and family. Built with modern web technologies for seamless real-time collaboration.
 
-![React](https://img.shields.io/badge/React-19.1.0-61dafb)
-![Node.js](https://img.shields.io/badge/Node.js-Express-339933)
-![MongoDB](https://img.shields.io/badge/MongoDB-8.15.1-47a248)
-![Socket.io](https://img.shields.io/badge/Socket.io-4.8.1-010101)
-
 ## ✨ Features
 
 - **Real-time Collaboration**: See changes instantly as your collaborators add or check off items
